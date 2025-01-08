@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitaBot</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color:#1e2537;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            width: 80%;
+            max-width: 600px;
+            height: 80%;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #eff6fc;
+            color: rgb(9, 8, 8);
+            text-align: center;
+            padding: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            margin-bottom: 15px;
+        }
+
+        .message.bot {
+            text-align: left;
+            color: #333;
+        }
+
+        .message.user {
+            text-align: right;
+            color: #007acc;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #d9d9d9;
+            padding: 10px;
+            background-color: #ffffff;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007acc;
+            color: white;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background-color: #005f99;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            HealthBot
+        </div>
+        <div class="chat-messages">
+            <div class="message bot">Hello! How can I assist you today?</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="Type your message...">
+            <button>Send</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.querySelector('.chat-messages');
+        const inputField = document.querySelector('.chat-input input');
+        const sendButton = document.querySelector('.chat-input button');
+
+        sendButton.addEventListener('click', () => {
+            const userMessage = inputField.value.trim();
+
+            if (userMessage) {
+                // Display user message
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.classList.add('message', 'user');
+                userMessageDiv.textContent = userMessage;
+                messagesContainer.appendChild(userMessageDiv);
+
+                // Scroll to the latest message
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // Clear input field
+                inputField.value = '';
+
+                // Simulate bot response
+                setTimeout(() => {
+                    const botMessageDiv = document.createElement('div');
+                    botMessageDiv.classList.add('message', 'bot');
+                    botMessageDiv.textContent = "I'm here to help you!";
+                    messagesContainer.appendChild(botMessageDiv);
+
+                    // Scroll to the latest message
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 1000);
+            }
+        });
+
+        // Allow pressing Enter to send message
+        inputField.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    </script>
+</body>
+</html>

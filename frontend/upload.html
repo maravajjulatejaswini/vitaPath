@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitamin Deficiency Predictor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e2537;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #0c0e0f;
+        }
+
+        form {
+            margin: 20px auto;
+            padding: 20px;
+            background: #c28585;
+            border-radius: 10px;
+            box-shadow: 0 0 25px 10px rgba(0, 0, 0, 0.2), 0 0 70px 20px rgba(28, 13, 95, 0.4);
+
+            width: 400px;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+      
+
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            color: #34495e;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #2980b9;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.1), 0 0 50px 15px rgba(124, 136, 69, 0.3);
+        }
+
+        #refresh-btn {
+            background-color: #e74c3c;
+            margin-top: 20px;
+        }
+
+        #refresh-btn:hover {
+            background-color: #c0392b;
+        }
+
+        #uploaded-image {
+            margin: 20px auto;
+            max-width: 90%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            display: block;
+        }
+
+        h2 {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #27ae60;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+    </style>
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('uploaded-image');
+                output.src = reader.result;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function refreshPage() {
+            // Hide the image preview
+            document.getElementById('uploaded-image').style.display = 'none'; 
+
+            // Reset file input
+            document.getElementById('image').value = ''; 
+
+            // Reset prediction
+            const prediction = document.getElementById('prediction');
+            if (prediction) {
+                prediction.style.display = 'none';
+            }
+
+            // Reset the form
+            document.querySelector('form').reset();
+        }
+    </script>
+</head>
+<body>
+    <h1>Vitamin Deficiency Predictor</h1>
+    <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
+        <label for="image" class="custom-file-upload">Choose Image</label>
+        <input type="file" name="image" id="image" required onchange="previewImage(event)">
+        <button type="submit">Predict</button>
+    </form>
+
+    <!-- Refresh button to reset the page -->
+    <button id="refresh-btn" onclick="refreshPage()">Refresh</button>
+
+    <!-- Centered preview uploaded image -->
+    <img id="uploaded-image" src="" alt="Uploaded Image Preview" style="display: none;">
+
+    <!-- Display prediction only if available -->
+    {% if prediction %}
+    <h2 id="prediction">Prediction: {{ prediction }}</h2>
+    {% endif %}
+
+    <footer>
+        <p>Powered by Machine Learning | Your Health, Our Priority</p>
+    </footer>
+</body>
+</html>

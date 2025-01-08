@@ -1,0 +1,97 @@
+/* home.css */
+
+/* General Reset */
+body {
+    margin: 0;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background-color: #9c8a8a;
+    padding: 20px,20px;
+    min-height: 2000vh;
+    content:inherit;
+}
+
+/* Container for main content */
+.container {
+    background-color: #ebdfdf;
+    width: 100%; /* Ensure it takes the full width of the page */
+    max-width:fit-content; /* Increase max-width to use more space on large screens */
+    margin-top: 100px;
+    margin-bottom: 100px;
+    padding: 20px 20px; /* Add some padding around the container */
+    box-sizing: border-box;
+}
+
+/* Top Image */
+.top-image {
+    margin-top: 30px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.top-image img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+/* Grid Layout */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for smaller screens */
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns for medium and larger screens */
+    }
+}
+
+.grid-item {
+    background-color: #fff; /* Set a white background for grid items */
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow for grid items */
+}
+
+.grid-item img {
+    width: 100%;
+    height: auto;
+    max-height: 200px; /* Adjust as needed */
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.grid-item button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.grid-item button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Responsiveness for small screens */
+@media (max-width: 600px) {
+    .grid-container {
+        grid-template-columns: 1fr; /* Stack grid items in 1 column for smaller screens */
+    }
+}

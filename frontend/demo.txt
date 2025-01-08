@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitamin Deficiency Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: blanchedalmond;
+        }
+        
+        .section img:hover {
+            transform: scale(1.05); /* Slight zoom effect */
+            box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.4), 0px 0px 30px rgba(255, 255, 0, 0.8); /* Enhanced shadow and glow */
+        }
+        .section .content {
+            flex: 1;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .section .content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .section .content ul li {
+            margin: 10px 0;
+        }
+        .section .content ul li a {
+            text-decoration: none;
+            color: #4ca458;
+        }
+        .section .content ul li a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .button button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4ca458;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Shadow for buttons */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+        }
+        .button button:hover {
+            background-color: #29f113;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+            transform: scale(1.05); /* Slight zoom effect */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .section {
+                flex-direction: column;
+                text-align: center;
+            }
+            .section img {
+                margin-bottom: 20px;
+            }
+        }
+        @media (max-width: 480px) {
+            nav {
+                flex-direction: column;
+                text-align: center;
+            }
+            nav .links a {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+   
+    <!-- Section 1 -->
+    <section class="section" id="home">
+        <img src="image1.jpg" alt="image1">
+        <div class="content">
+            <p>Explore various tools and resources for detecting and addressing vitamin deficiencies effectively.</p>
+            <ul>
+                <li><a href="#detection-images">1. Detection from Images</a></li>
+                <li><a href="#detection-symptoms">2. Detection from Symptoms</a></li>
+                <li><a href="#documentation">3. Documentation and Details</a></li>
+                <li><a href="#curing-food">4. Curing Food</a></li>
+                <li><a href="#healthbot">5. HealthBot</a></li>
+                <li><a href="#dermatologist">6. Dermatologist Finder</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="section">
+        <div class="content">
+            <h2 id="detection-images">Detection from Images</h2>
+            <p>Upload images to analyze potential vitamin deficiencies based on visual markers.</p>
+            <div class="button">
+                <button>Upload an Image</button>
+            </div>
+        </div>
+        <img src="images.jpg" alt="Detection from Images">
+    </section>
+
+    <!-- Section 3 -->
+    <section class="section">
+        <img src="image2.jpg" alt="Curing Food">
+        <div class="content">
+            <h2 id="curing-food">Curing Food</h2>
+            <p>Discover a list of foods rich in essential vitamins to help cure deficiencies.</p>
+            <div class="button">
+                <button>Find Foods</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4 -->
+    <section class="section">
+        <div class="content">
+            <h2 id="dermatologist">Top Dermatologists Near You</h2>
+            <p>Locate highly rated dermatologists who can assist with skin-related vitamin deficiencies.</p>
+            <div class="button">
+                <button>Find Dermatologists</button>
+            </div>
+        </div>
+        <img src="image3.jpg" alt="Dermatologist Finder">
+    </section>
+
+    <!-- Section 5 -->
+    <section class="section">
+        <img src="image4.jpg" alt="HealthBot">
+        <div class="content">
+            <h2 id="healthbot">HealthBot</h2>
+            <p>Chat with our HealthBot to get quick insights and suggestions for managing vitamin deficiencies.</p>
+            <div class="button">
+                <button>Start Chat</button>
+            </div>
+        </div>
+    </section>
+
+   
+
+</body>
+</html>
+
+
+
+
+
+
+getstarted
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy Food Vitamin Chart</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            max-width: 600px;
+        }
+
+        .container img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .container h1 {
+            font-size: 24px;
+            margin: 20px 0 10px;
+            color: #333;
+        }
+
+        .container p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="top-image.avif">
+        <h1>Healthy Food Vitamin Chart</h1>
+        <p>Explore the essential vitamins in your daily food for a balanced and healthy life.</p>
+        <a href="#" class="button">Get Started</a>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+getstarted
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy Food Vitamin Chart</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('top-image.avif') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+            padding: 20px 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .container p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #ddd;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Healthy Food Vitamin Chart</h1>
+        <p>Revolutionize the detection and management of vitamin deficiencies, Explore the essential vitamins in your daily food for a balanced and healthy life
+        </p>
+        <a href="#" class="button">Get Started</a>
+    </div>
+</body>
+</html>
+
+
+imupload.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Results</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e2537;
+        }
+
+        .container {
+            display: flex;
+            width: 80%;
+            height: 70%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        .upload-section, .results-section {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .upload-section {
+            background-color: #e6f7ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px solid #d9d9d9;
+        }
+
+        .upload-section h2 {
+            margin-bottom: 20px;
+            color: #1e2537;
+        }
+
+        .upload-section input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .results-section {
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .results-section h2 {
+            margin-bottom: 20px;
+            color: #595959;
+        }
+
+        .results-container {
+            width: 90%;
+            height: 60%;
+            border: 2px dashed #d9d9d9;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #a6a6a6;
+            text-align: center;
+        }
+
+        /* Header Section with Buttons */
+        .header {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #1e2537;
+        }
+
+        .header button {
+            background-color: #066696;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .header h1 {
+            color: white;
+            margin: 0;
+        }
+
+        .header button:hover {
+            background-color: #45a049;
+        }
+
+        .header .vitaPath-title {
+            margin-left: auto;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .vitaPath-title{
+            color: #e6f7ff;
+
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- Logo Button and Chat with Bot -->
+        <div>
+            <button onclick="window.location.href='getstarted.html';">Logout</button>
+            <button onclick="window.location.href='chatbot.html';">Chat with Bot</button>
+        </div>
+        <!-- VitaPath Title -->
+        <div class="vitaPath-title">VitaPath.</div>
+    </div>
+
+    <div class="container">
+        <div class="upload-section">
+            <h2>Upload Your Image</h2>
+            <input type="file" accept="image/*" id="imageInput" onchange="uploadImage()">
+      </div>
+        <div class="results-section">
+            <h3>Deficiencies You Possibly Have</h3>
+            <div class="results-container" id="results">
+                <p>No results to display yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function uploadImage() {
+            const fileInput = document.getElementById('imageInput');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+    
+            fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.results-container').innerHTML = `<p>${data.predicted_class}</p>`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

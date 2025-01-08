@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitamin Deficiency Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color:#1e2537;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #1e2537;
+            color:bisque;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            flex-wrap: wrap;
+            z-index: 1000;
+            box-shadow: 0px 4px 6px rgba(85, 85, 85, 0.84); /* Shadow for navigation */
+        }
+        nav .title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        nav .links {
+            display: flex;
+            align-items: center;
+        }
+        nav .links a {
+            color:bisque;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        p,h2{
+            color:bisque;
+        }
+        nav .links a:hover {
+            text-decoration: underline;
+        }
+        nav .logout {
+            margin-left: 15px;
+        }
+        nav .logout button {
+            background-color: #ff6666; /* Light red color */
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Shadow for button */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+        }
+        nav .logout button:hover {
+            background-color: #ff3333; /* Darker red on hover */
+            box-shadow: 0px 6px 12px #5e5858; /* Enhanced shadow */
+            transform: scale(1.05); /* Slight zoom effect */
+        }
+        .section {
+            display: flex;
+            padding: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 60px; /* Adjust to compensate for fixed nav */
+        }
+        .section img {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0px 8px 30px rgba(121, 116, 194, 0.205), 0px 0px 30px rgba(142, 136, 229, 0.84); /* Enhanced shadow and glow */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth animation */
+        }
+        .section img:hover {
+            transform: scale(1.05); /* Slight zoom effect */
+            box-shadow: 0px 8px 30px rgba(121, 116, 194, 0.205), 0px 0px 30px rgba(121, 116, 194, 0.205); /* Enhanced shadow and glow */
+        }
+        .section .content {
+            flex: 1;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .section .content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .section .content ul li {
+            margin: 10px 0;
+        }
+        .section .content ul li a {
+            text-decoration: none;
+            color: #11d72c;
+        }
+        .section .content ul li a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .button button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4ca458;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px #d7c5c5; /* Shadow for buttons */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+        }
+        .button button:hover {
+            background-color: #29f113;
+            box-shadow: 0px 6px 12px #d7c5c5; /* Enhanced shadow on hover */
+            transform: scale(1.05); /* Slight zoom effect */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .section {
+                flex-direction: column;
+                text-align: center;
+            }
+            .section img {
+                margin-bottom: 20px;
+            }
+        }
+        @media (max-width: 480px) {
+            nav {
+                flex-direction: column;
+                text-align: center;
+            }
+            nav .links a {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="title">VITAPath.</div>
+        <div class="links">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#profile">Profile</a>
+            <div class="logout">
+                <button>Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section 1 -->
+    <section class="section" id="home">
+        <img src="{{ url_for('static', filename='image1.jpg') }}" alt="image1">
+
+        <div class="content">
+            <p>Explore various tools and resources for detecting and addressing vitamin deficiencies effectively.</p>
+            <ul>
+                <li><a href="#detection-images">1. Detection from Images</a></li>
+                <li><a href="#detection-symptoms">2. Detection from Symptoms</a></li>
+                <li><a href="#documentation">3. Documentation and Details</a></li>
+                <li><a href="#curing-food">4. Curing Food</a></li>
+                <li><a href="#healthbot">5. HealthBot</a></li>
+                <li><a href="#dermatologist">6. Dermatologist Finder</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="section">
+        <div class="content">
+            <h2 id="detection-images">Detection from Images</h2>
+            <p>Upload images to analyze potential vitamin deficiencies based on visual markers.</p>
+            <!-- Image Upload Form -->
+            <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
+                <div class="button">
+                    <label for="image-upload" class="btn">Upload an Image</label>
+                    <input type="file" name="image" id="image-upload" accept="image/*" style="display:none;">
+                </div>
+                <button type="submit">Predict through Images</button>
+            </form>
+        </div>
+        <img src="{{ url_for('static', filename='images.jpg') }}" alt="image1">
+    </section>
+    
+
+    <!-- Section 3 -->
+    <section class="section">
+        <img src="{{ url_for('static', filename='image2.jpg') }}" alt="image1">
+        <div class="content">
+            <h2 id="curing-food">Curing Food</h2>
+            <p>Discover a list of foods rich in essential vitamins to help cure deficiencies.</p>
+            <div class="button">
+                <button>Find Foods</button>
+            </div>
+        </div>
+    </section>
+
+    
+    <!-- Section 4 -->
+    <section class="section">
+        <div class="content">
+            <h2 id="dermatologist">Top Dermatologists Near You</h2>
+            <p>Locate highly rated dermatologists who can assist with skin-related vitamin deficiencies.</p>
+            <div class="button">
+                <button>Find Dermatologists</button>
+            </div>
+        </div>
+        <img src="{{ url_for('static', filename='image3.jpg') }}" alt="image1">
+    </section>
+
+    <!-- Section 5 -->
+    <section class="section">
+        <img src="{{ url_for('static', filename='image4.jpg') }}" alt="image1">
+        <div class="content">
+            <h2 id="healthbot">HealthBot</h2>
+            <p>Chat with our HealthBot to get quick insights and suggestions for managing vitamin deficiencies.</p>
+            <div class="button">
+                <button>Start Chat</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6 -->
+    <section class="section">
+        <div class="content">
+            <h2 id="documentation">Documentation and Details</h2>
+            <p>Read in-depth documentation about the causes, effects, and prevention of vitamin deficiencies.</p>
+            <div class="button">
+                <button>Read Documentation</button>
+            </div>
+        </div>
+        <img src="{{ url_for('static', filename='image5.jpg') }}" alt="image1">
+    </section>
+
+    <!-- Section 7 -->
+    <section class="section">
+        <img src="{{ url_for('static', filename='image6.jpg') }}" alt="image1">
+        <div class="content">
+            <h2 id="detection-symptoms">Detection from Symptoms</h2>
+            <p>Identify vitamin deficiencies by entering physical symptoms for a quick analysis.</p>
+            <div class="button">
+                <button>Analyze Symptoms</button>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

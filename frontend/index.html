@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy Food Vitamin Chart</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('top-image.avif') no-repeat center center/cover;
+            color: #fff;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(47, 44, 44, 0.7);
+            padding: 10px 20px;
+        }
+
+        nav .title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        nav .links {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav .links a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 1em;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav .links a:hover {
+            color: #4CAF50;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5); /* Lightened the background */
+            padding: 20px 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .container p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #ddd;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color:#1e2537;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .about-section, .features-section {
+            background: rgba(0, 0, 0, 0.5); /* Lightened the background */
+            color: #ddd;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .about-section h2, .features-section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .about-section p, .features-section ul {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .features-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-section li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="title">Healthy Food Vitamin Chart</div>
+        <div class="links">
+            <a href="#about">About</a>
+            <a href="#features">Features</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('signup') }}">Signup</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Healthy Food Vitamin Chart</h1>
+        <p>Revolutionize the detection and management of vitamin deficiencies, explore the essential vitamins in your daily food for a balanced and healthy life.</p>
+        <a href="{{ url_for('get_started') }}" class="button">Get Started</a>
+    </div>
+
+    <div id="about" class="about-section">
+        <h2>About Our Vitamin Deficiency Detection App</h2>
+        <p>Our app is designed to help you identify and manage vitamin deficiencies effectively. With cutting-edge technology, you can upload images for analysis, log symptoms, and get personalized food recommendations. The app also offers insights into dermatologist findings, a chatbot for health-related queries, and detailed documentation on deficiencies. Embark on your journey toward a healthier life today!</p>
+    </div>
+
+    <div id="features" class="features-section">
+        <h2>Features</h2>
+        <ul>
+            <li>1. Detection from images</li>
+            <li>2. Detection from symptoms</li>
+            <li>3. Curing food recommendations</li>
+            <li>4. Doctor Locator</li>
+            <li>5. Healthbot assistance</li>
+            <li>6. Documentation and details of deficiencies</li>
+        </ul>
+    </div>
+</body>
+</html>
