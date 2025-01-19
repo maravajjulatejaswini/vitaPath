@@ -70,7 +70,6 @@ def update_profile():
     # Render the update profile page with current user data
     return render_template('update_profile.html', user=user)
 
-# Route for Signup Page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -146,9 +145,10 @@ def login():
 
 
 
+
 # Email validation function using Hunter.io
-def verify_email_exists(email):
-    hunter_api_key = "b4229aa30ab3a569894b51c8b05b007641ce636e"  # Replace with your actual API key
+'''def verify_email_exists(email):
+    hunter_api_key = "1bee4c88f13bd20373a8fa40d933f556319f92da"  # Replace with your actual API key
     url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={hunter_api_key}"
     
     try:
@@ -160,7 +160,39 @@ def verify_email_exists(email):
             return False
     except Exception as e:
         print(f"Error verifying email: {e}")
+        return False'''
+import requests
+def verify_email_exists(email):
+    hunter_api_key = "b4229aa30ab3a569894b51c8b05b007641ce636e"  # Replace with your actual API key
+    url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={hunter_api_key}"
+    
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Debugging: Print the full response
+        print("Hunter.io API Response:", data)
+        
+        email_data = data.get('data', {})
+        
+        # Check the status field (preferred over deprecated 'result')
+        status = email_data.get('status')
+        
+        if status == 'valid':
+            return True  # Email is valid
+        elif status == 'accept_all' and email_data.get('smtp_check') and email_data.get('mx_records'):
+            return True  # Email might be valid for "accept_all" domains
+        else:
+            return False  # Risky or undeliverable email
+    except requests.exceptions.RequestException as e:
+        print(f"Request error: {e}")
         return False
+    except Exception as e:
+        print(f"Error verifying email: {e}")
+        return False
+
+
 
 # Email format validation using regex
 def validate_email(email):
@@ -240,11 +272,11 @@ def index():
     return render_template('index.html')
 '''@app.route('/login')
 def login():
-    return render_template('login.html')
+    return render_template('login.html')'''
 
-@app.route('/signup')
-def signup():
-    return render_template('signup.html')'''
+@app.route('/symtom')
+def symtom():
+    return render_template('symptombased.html')
 
 @app.route('/home')
 def home():
@@ -446,4 +478,4 @@ def recommend():
     return render_template('recommend.html')
 
 if __name__ == '__main__':
-    app.run(debug=False,host='0.0.0.0')
+    app.run(debug=True)
