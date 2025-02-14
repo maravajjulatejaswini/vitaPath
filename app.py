@@ -21,13 +21,13 @@ import requests
 import re
 
 app = Flask(__name__, template_folder='frontend')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Use SQLite for simplicity
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  
 app.config['SECRET_KEY'] = '9f8b8c4d5a6f7c8e9d0a1b2c3d4e5f6a'
 
 db = SQLAlchemy(app)
 from flask import request, redirect, url_for, flash
 from flask import session, redirect, url_for, render_template
-# Create a User model
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -42,12 +42,10 @@ from flask_sqlalchemy import SQLAlchemy
 
 @app.route('/update_profile', methods=['GET', 'POST'])
 def update_profile():
-    # Fetch the user's email from the session
     user_email = session.get('user_email')
     
   
     
-    # Fetch user details using the email
     user = User.query.filter_by(email=user_email).first()
     
     if not user:
@@ -55,7 +53,6 @@ def update_profile():
         return redirect(url_for('home'))
     
     if request.method == 'POST':
-        # Get the new name and password from the form
         new_name = request.form['name']
         new_password = request.form['password']
         
@@ -67,7 +64,6 @@ def update_profile():
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('home'))  # Redirect after successful update
     
-    # Render the update profile page with current user data
     return render_template('update_profile.html', user=user)
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -78,17 +74,14 @@ def signup():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
-        # Validate that all fields are filled
         if not name or not email or not password or not confirm_password:
             flash("All fields are required!", "danger")
             return redirect(url_for('signup'))
 
-        # Check if password and confirm password match
         if password != confirm_password:
             flash("Passwords don't match!", "danger")
             return redirect(url_for('signup'))
 
-        # Validate email format (you can add your own validation here)
         if not validate_email(email):
             flash("Invalid email format", "danger")
             return redirect(url_for('signup'))
@@ -203,69 +196,134 @@ def validate_email(email):
         return False
 
 
+from flask import Flask, render_template, request, jsonify
+import os
+from werkzeug.utils import secure_filename
+import tensorflow as tf
+import numpy as np
+from PIL import Image
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input as mobilenet_preprocess
+from tensorflow.keras.applications.efficientnet import preprocess_input as efficientnet_preprocess
 
+app = Flask(__name__)
 
-# Initialize Flask app with custom template folder
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'jfif'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Load the saved Random Forest model
-rf_classifier = joblib.load('random_forest_vitamin_bnew.pkl')
+# Load models
+nail_model = tf.keras.models.load_model('nail_model.h5')  # EfficientNetB0 (224x224)
+lip_model = tf.keras.models.load_model('angular_cheilitis_model.h5')  # MobileNetV2 (224x224)
+tongue_model = tf.keras.models.load_model('tongue_condition_model.h5')  # Custom CNN (150x150)
+eye_model = tf.keras.models.load_model('eye_condition_model.h5')  # EfficientNetB0 (224x224)
+skin_model = tf.keras.models.load_model('skin_condition_model.h5')  # EfficientNetB0 (224x224)
 
-# Load the pre-trained VGG16 model for feature extraction
-vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(150, 150, 3))
-feature_extractor = Model(inputs=vgg_model.input, outputs=vgg_model.output)
+# Define categories
+nail_categories = ['beau lines', 'leukonychia', 'spooned nails']
+lip_categories = ['angular cheilitis']
+tongue_categories = ['glossitis', 'mouth ulcers', 'red color', 'smooth texture']
+eye_categories = ['redness', 'glaucoma']
+skin_categories = ['purpura']
 
-for layer in feature_extractor.layers:
-    layer.trainable = False
-
-# Define class names
-class_names = {
-    0: 'Vitamin A Deficiency',
-    1: 'Vitamin B Deficiency',
-    2: 'Vitamin C Deficiency',
-    3: 'Vitamin D Deficiency',
-    4: 'Vitamin E Deficiency',
-    5: 'No Deficiency'
+deficiency_mapping = {
+    'angular cheilitis': 'B1, B2, B3, Iron',
+    'glossitis': 'B2, B3, B12',
+    'red color': 'B12, Iron',
+    'mouth ulcers': 'B12',
+    'smooth texture': 'B12, Iron',
+    'beau lines': 'B7, B9, Zinc',
+    'leukonychia': 'Calcium, B7, B9',
+    'spooned nails': 'C, B7, B9',
+    'redness': 'Vitamin A Deficiency',
+    'glaucoma': 'Deficiencies in folate, vitamin B12',
+    'purpura': 'Vitamin C Deficiency'
 }
 
-def predict_deficiency(img):
-    img = img.resize((150, 150))  # Resize to match model input
-    img_array = img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = preprocess_input(img_array)
-    
-    features = feature_extractor.predict(img_array)
-    features_flattened = features.reshape(features.shape[0], -1)
-    
-    prediction = rf_classifier.predict(features_flattened)
-    return class_names.get(prediction[0], 'Unknown Deficiency')
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def predict_category(image_path, model, categories, target_size, preprocess_fn):
+    """Function to preprocess image, run model, and return predictions."""
+    try:
+        print(f"Processing image: {image_path}")
 
-@app.route('/upload', methods=['GET','POST'])
-def upload():
-    return render_template('upload.html', prediction=None)
-@app.route('/predict', methods=['GET', 'POST'])
+        img = Image.open(image_path).convert('RGB')  
+        img = img.resize(target_size)
+        img_array = np.array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        img_array = preprocess_fn(img_array)
+
+        print("Image shape after preprocessing:", img_array.shape)
+
+        # Check if the model requires flattened input
+        if len(model.input_shape) == 2:
+            img_array = img_array.reshape(1, -1)  # Flatten if needed
+
+        predictions = model.predict(img_array)
+
+        if predictions.shape[1] == 1:  # Binary classification (sigmoid output)
+            scores = {categories[0]: predictions[0][0] * 100}
+        else:  # Multi-class classification (softmax output)
+            scores = {categories[i]: predictions[0][i] * 100 for i in range(len(categories))}
+
+        print("Predictions:", scores)
+        return scores
+
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        return None
+
+@app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == 'POST':
-        file = request.files['image']  # Use .get() to avoid errors if the key doesn't exist
-        if file:
-            try:
-                # Open the image file
-                img = Image.open(file.stream)
-                img.show()  # This will display the image, helpful for debugging
-                print(f"Image uploaded: {file.filename}")
+    if 'file' not in request.files or 'category' not in request.form:
+        return jsonify({'error': 'No file or category selected'}), 400
 
-                # Call your prediction function (replace with your actual function)
-                predicted_class_name = predict_deficiency(img)
+    file = request.files['file']
+    category = request.form.get('category')
 
-                print(f"Prediction: {predicted_class_name}")  # Ensure prediction is made
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
 
-                # Return the result to the user
-                return render_template('upload.html', prediction=predicted_class_name)
-            except Exception as e:
-                print(f"Error processing image: {e}")
-                return render_template('upload.html', prediction="Error during prediction")
-    
-    return render_template('upload.html', prediction=None)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        print(f"File saved at: {filepath}")
+
+        # Model configurations based on category
+        category_models = {
+            'nails': (nail_model, nail_categories, (224, 224), efficientnet_preprocess),
+            'lips': (lip_model, lip_categories, (224, 224), mobilenet_preprocess),
+            'tongue': (tongue_model, tongue_categories, (150, 150), lambda x: x),  # Custom CNN (No special preprocessing)
+            'eyes': (eye_model, eye_categories, (224, 224), efficientnet_preprocess),
+            'skin': (skin_model, skin_categories, (224, 224), efficientnet_preprocess)
+        }
+
+        if category not in category_models:
+            return jsonify({'error': 'Invalid category selected'}), 400
+
+        model, categories, target_size, preprocess_fn = category_models[category]
+
+        scores = predict_category(filepath, model, categories, target_size, preprocess_fn)
+
+        if scores is None:
+            return jsonify({'error': 'Error processing image'}), 500
+
+        best_category = max(scores, key=scores.get)
+        deficiency = deficiency_mapping.get(best_category, 'No deficiency detected')
+
+        return jsonify({
+            'predicted_category': best_category,
+            'confidence': scores[best_category],
+            'deficiency': deficiency
+        })
+
+    return jsonify({'error': 'Invalid file type'}), 400
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 @app.route('/')
 def index():
@@ -479,3 +537,4 @@ def recommend():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
