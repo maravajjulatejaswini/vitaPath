@@ -20,52 +20,38 @@ from flask_sqlalchemy import SQLAlchemy
 import requests
 import re
 
-app = Flask(__name__, template_folder='frontend')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  
-app.config['SECRET_KEY'] = '9f8b8c4d5a6f7c8e9d0a1b2c3d4e5f6a'
 
-db = SQLAlchemy(app)
+
+
 from flask import request, redirect, url_for, flash
 from flask import session, redirect, url_for, render_template
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
 
 from flask import render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 
 
 
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+import requests
+import re
+from werkzeug.security import generate_password_hash, check_password_hash  # For password security
 
-@app.route('/update_profile', methods=['GET', 'POST'])
-def update_profile():
-    user_email = session.get('user_email')
-    
-  
-    
-    user = User.query.filter_by(email=user_email).first()
-    
-    if not user:
-        flash('User not found!', 'danger')
-        return redirect(url_for('home'))
-    
-    if request.method == 'POST':
-        new_name = request.form['name']
-        new_password = request.form['password']
-        
-        # Update the user's details in the database
-        user.name = new_name
-        user.password = new_password
-        db.session.commit()
-        
-        flash('Profile updated successfully!', 'success')
-        return redirect(url_for('home'))  # Redirect after successful update
-    
-    return render_template('update_profile.html', user=user)
+app = Flask(__name__, template_folder='frontend')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Use SQLite for simplicity
+app.config['SECRET_KEY'] = '9f8b8c4d5a6f7c8e9d0a1b2c3d4e5f6a'
 
+db = SQLAlchemy(app)
+
+# Create a User model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)  # Increased length for hashed passwords
+
+# Route for Signup Page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -74,14 +60,17 @@ def signup():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
+        # Validate that all fields are filled
         if not name or not email or not password or not confirm_password:
             flash("All fields are required!", "danger")
             return redirect(url_for('signup'))
 
+        # Check if password and confirm password match
         if password != confirm_password:
             flash("Passwords don't match!", "danger")
             return redirect(url_for('signup'))
 
+        # Validate email format
         if not validate_email(email):
             flash("Invalid email format", "danger")
             return redirect(url_for('signup'))
@@ -90,13 +79,17 @@ def signup():
         if User.query.filter_by(email=email).first():
             flash("Email already exists!", "danger")
             return redirect(url_for('signup'))
-        if not verify_email_exists(email):
-             flash("Invalid email ", "danger")
-             return redirect(url_for('signup'))
 
+        # Verify email existence using Hunter.io (optional)
+        if not verify_email_exists(email):
+            flash("Invalid email", "danger")
+            return redirect(url_for('signup'))
+
+        # Hash the password before storing it
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
         # Create a new user
-        new_user = User(name=name, email=email, password=password)
+        new_user = User(name=name, email=email, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
 
@@ -104,8 +97,6 @@ def signup():
         return redirect(url_for('login'))  # Redirect to login after successful signup
 
     return render_template('signup.html')
-
-
 
 # Route for Login Page
 @app.route('/login', methods=['GET', 'POST'])
@@ -122,219 +113,233 @@ def login():
         # Retrieve the user from the database
         user = User.query.filter_by(email=email).first()
 
-        if user is None:
+        if user is None or not check_password_hash(user.password, password):
             flash("Invalid email or password.", "danger")
             return redirect(url_for('login'))
 
-        # Check if the password matches
-        if user.password != password:
-            flash("Invalid email or password.", "danger")
-            return redirect(url_for('login'))
-
+        session['user_id'] = user.id  # Store user ID in session
         flash("Login successful!", "success")
         return redirect(url_for('home'))  # Redirect to home page after successful login
 
     return render_template('login.html')
 
-
-
-
 # Email validation function using Hunter.io
-'''def verify_email_exists(email):
-    hunter_api_key = "1bee4c88f13bd20373a8fa40d933f556319f92da"  # Replace with your actual API key
-    url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={hunter_api_key}"
-    
-    try:
-        response = requests.get(url)
-        data = response.json()
-        if data['data']['result'] == 'deliverable':
-            return True
-        else:
-            return False
-    except Exception as e:
-        print(f"Error verifying email: {e}")
-        return False'''
-import requests
 def verify_email_exists(email):
-    hunter_api_key = "b4229aa30ab3a569894b51c8b05b007641ce636e"  # Replace with your actual API key
+    hunter_api_key = "b4229aa30ab3a569894b51c8b05b007641ce636e" # Replace with actual API key
     url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={hunter_api_key}"
     
     try:
         response = requests.get(url)
-        response.raise_for_status()
         data = response.json()
-        
-        # Debugging: Print the full response
-        print("Hunter.io API Response:", data)
-        
-        email_data = data.get('data', {})
-        
-        # Check the status field (preferred over deprecated 'result')
-        status = email_data.get('status')
-        
-        if status == 'valid':
-            return True  # Email is valid
-        elif status == 'accept_all' and email_data.get('smtp_check') and email_data.get('mx_records'):
-            return True  # Email might be valid for "accept_all" domains
-        else:
-            return False  # Risky or undeliverable email
-    except requests.exceptions.RequestException as e:
-        print(f"Request error: {e}")
-        return False
+        return data.get('data', {}).get('result') == 'deliverable'
     except Exception as e:
         print(f"Error verifying email: {e}")
         return False
-
-
 
 # Email format validation using regex
 def validate_email(email):
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    if re.match(email_regex, email):
-        return True
-    else:
-        return False
+    return re.match(email_regex, email) is not None
 
 
-from flask import Flask, render_template, request, jsonify
-import os
-from werkzeug.utils import secure_filename
-import tensorflow as tf
-import numpy as np
-from PIL import Image
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input as mobilenet_preprocess
-from tensorflow.keras.applications.efficientnet import preprocess_input as efficientnet_preprocess
 
-app = Flask(__name__)
 
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'jfif'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Load models
-nail_model = tf.keras.models.load_model('nail_model.h5')  # EfficientNetB0 (224x224)
-lip_model = tf.keras.models.load_model('angular_cheilitis_model.h5')  # MobileNetV2 (224x224)
-tongue_model = tf.keras.models.load_model('tongue_condition_model.h5')  # Custom CNN (150x150)
-eye_model = tf.keras.models.load_model('eye_condition_model.h5')  # EfficientNetB0 (224x224)
-skin_model = tf.keras.models.load_model('skin_condition_model.h5')  # EfficientNetB0 (224x224)
 
-# Define categories
-nail_categories = ['beau lines', 'leukonychia', 'spooned nails']
-lip_categories = ['angular cheilitis']
-tongue_categories = ['glossitis', 'mouth ulcers', 'red color', 'smooth texture']
-eye_categories = ['redness', 'glaucoma']
-skin_categories = ['purpura']
 
-deficiency_mapping = {
-    'angular cheilitis': 'B1, B2, B3, Iron',
-    'glossitis': 'B2, B3, B12',
-    'red color': 'B12, Iron',
-    'mouth ulcers': 'B12',
-    'smooth texture': 'B12, Iron',
-    'beau lines': 'B7, B9, Zinc',
-    'leukonychia': 'Calcium, B7, B9',
-    'spooned nails': 'C, B7, B9',
-    'redness': 'Vitamin A Deficiency',
-    'glaucoma': 'Deficiencies in folate, vitamin B12',
-    'purpura': 'Vitamin C Deficiency'
+# Initialize Flask app with custom template folder
+
+# Load the saved Random Forest model
+''''rf_classifier = joblib.load('random_forest_vitamin_bnew.pkl')
+
+# Load the pre-trained VGG16 model for feature extraction
+vgg_model = VGG16(weights='imagenet', include_top=False, input_shape=(150, 150, 3))
+feature_extractor = Model(inputs=vgg_model.input, outputs=vgg_model.output)
+
+for layer in feature_extractor.layers:
+    layer.trainable = False
+
+# Define class names
+class_names = {
+    0: 'Vitamin A Deficiency',
+    1: 'Vitamin B Deficiency',
+    2: 'Vitamin C Deficiency',
+    3: 'Vitamin D Deficiency',
+    4: 'Vitamin E Deficiency',
+    5: 'No Deficiency'
 }
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def predict_deficiency(img):
+    img = img.resize((150, 150))  # Resize to match model input
+    img_array = img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = preprocess_input(img_array)
+    
+    features = feature_extractor.predict(img_array)
+    features_flattened = features.reshape(features.shape[0], -1)
+    
+    prediction = rf_classifier.predict(features_flattened)
+    return class_names.get(prediction[0], 'Unknown Deficiency')
 
-def predict_category(image_path, model, categories, target_size, preprocess_fn):
-    """Function to preprocess image, run model, and return predictions."""
-    try:
-        print(f"Processing image: {image_path}")
 
-        img = Image.open(image_path).convert('RGB')  
-        img = img.resize(target_size)
-        img_array = np.array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-        img_array = preprocess_fn(img_array)
+@app.route('/upload', methods=['GET','POST'])
+def upload():
+    return render_template('upload.html', prediction=None)
+@app.route('/predict', methods=['GET', 'POST'])
+def predict():
+    if request.method == 'POST':
+        file = request.files['image']  # Use .get() to avoid errors if the key doesn't exist
+        if file:
+            try:
+                # Open the image file
+                img = Image.open(file.stream)
+                img.show()  # This will display the image, helpful for debugging
+                print(f"Image uploaded: {file.filename}")
 
-        print("Image shape after preprocessing:", img_array.shape)
+                # Call your prediction function (replace with your actual function)
+                predicted_class_name = predict_deficiency(img)
 
-        # Check if the model requires flattened input
-        if len(model.input_shape) == 2:
-            img_array = img_array.reshape(1, -1)  # Flatten if needed
+                print(f"Prediction: {predicted_class_name}")  # Ensure prediction is made
 
-        predictions = model.predict(img_array)
+                # Return the result to the user
+                return render_template('upload.html', prediction=predicted_class_name)
+            except Exception as e:
+                print(f"Error processing image: {e}")
+                return render_template('upload.html', prediction="Error during prediction")
+    
+    return render_template('upload.html', prediction=None)'''
 
-        if predictions.shape[1] == 1:  # Binary classification (sigmoid output)
-            scores = {categories[0]: predictions[0][0] * 100}
-        else:  # Multi-class classification (softmax output)
-            scores = {categories[i]: predictions[0][i] * 100 for i in range(len(categories))}
+from flask import Flask, render_template, request, redirect, url_for
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+import numpy as np
+import os
 
-        print("Predictions:", scores)
-        return scores
 
-    except Exception as e:
-        print(f"Error processing image: {e}")
-        return None
+from flask import Flask, request, jsonify
 
+# Load the trained model
+'''MODEL_PATH = "deficiency_classifier.h5"
+model = tf.keras.models.load_model(MODEL_PATH)
+print("Model loaded successfully.")  # Debug
+
+# Define class labels (update these with your dataset class names)
+class_labels = ['Vitamin A and B12 deficiency', 'B1, B2 ,B3 ,Iron deficiency', 'B2, B3, B12 deficiency', 'B7, B9, C deficiency', 'C deficiency']
+
+# Ensure the 'uploads' folder exists for storing uploaded images
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Route to render the upload page
+@app.route('/upload')
+def upload():
+    return render_template('upload.html')
+
+# Route to handle image upload and prediction
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'file' not in request.files or 'category' not in request.form:
-        return jsonify({'error': 'No file or category selected'}), 400
+    if 'file' not in request.files:
+        return "No file uploaded", 400
 
     file = request.files['file']
-    category = request.form.get('category')
-
     if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+        return "No file selected", 400
 
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
+    if file:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
 
-        print(f"File saved at: {filepath}")
+        # Preprocess the image
+        img = image.load_img(file_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+        img_array /= 255.0  # Normalize
 
-        # Model configurations based on category
-        category_models = {
-            'nails': (nail_model, nail_categories, (224, 224), efficientnet_preprocess),
-            'lips': (lip_model, lip_categories, (224, 224), mobilenet_preprocess),
-            'tongue': (tongue_model, tongue_categories, (150, 150), lambda x: x),  # Custom CNN (No special preprocessing)
-            'eyes': (eye_model, eye_categories, (224, 224), efficientnet_preprocess),
-            'skin': (skin_model, skin_categories, (224, 224), efficientnet_preprocess)
-        }
+        # Predict using the model
+        predictions = model.predict(img_array)
+        predicted_class = np.argmax(predictions)  # Get the highest probability class
+        predicted_label = class_labels[predicted_class]
 
-        if category not in category_models:
-            return jsonify({'error': 'Invalid category selected'}), 400
+        return jsonify({"Prediction": predicted_label}) ---- it workss'''
+from flask import Flask, render_template, request, jsonify
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+import numpy as np
+import os
 
-        model, categories, target_size, preprocess_fn = category_models[category]
 
-        scores = predict_category(filepath, model, categories, target_size, preprocess_fn)
 
-        if scores is None:
-            return jsonify({'error': 'Error processing image'}), 500
+# Load the TFLite model
+MODEL_PATH = r"D:\Desktop\essentials\feature wise major\feature wise major\f1 img prediction\additionals\my f1\deficiency_classifier_quantized.tflite"
+interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
+interpreter.allocate_tensors()
 
-        best_category = max(scores, key=scores.get)
-        deficiency = deficiency_mapping.get(best_category, 'No deficiency detected')
+# Get input and output tensor details
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
-        return jsonify({
-            'predicted_category': best_category,
-            'confidence': scores[best_category],
-            'deficiency': deficiency
-        })
+# Define class labels (update these with your dataset class names)
+class_labels = ['Vitamin A and B12 deficiency', 'B1, B2 ,B3 ,Iron deficiency', 
+                'B2, B3, B12 deficiency', 'B7, B9, C deficiency', 'C deficiency']
 
-    return jsonify({'error': 'Invalid file type'}), 400
+# Ensure the 'uploads' folder exists for storing uploaded images
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Route to render the upload page
+@app.route('/upload')
+def upload():
+    return render_template('upload.html')
+
+# Route to handle image upload and prediction
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return "No file uploaded", 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return "No file selected", 400
+
+    if file:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
+
+        # Preprocess the image
+        img = image.load_img(file_path, target_size=(224, 224))  # Adjust based on model input
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0).astype(np.float32)  # Ensure correct shape
+        img_array /= 255.0  # Normalize if needed
+
+        # Run inference
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()
+        predictions = interpreter.get_tensor(output_details[0]['index'])
+
+        # Get the highest probability class
+        predicted_class = np.argmax(predictions)
+        predicted_label = class_labels[predicted_class]
+
+        return jsonify({"Prediction": predicted_label})
+
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
 '''@app.route('/login')
 def login():
-    return render_template('login.html')'''
+    return render_template('home.html')
 
-@app.route('/symtom')
-def symtom():
-    return render_template('symptombased.html')
+@app.route('/signup')
+def signup():
+    return render_template('home.html')'''
 
 @app.route('/home')
 def home():
@@ -343,6 +348,9 @@ def home():
 @app.route('/get_started')
 def get_started():
     return render_template('index(3).html') 
+@app.route('/symptombased')
+def symptombased():
+    return render_template('symptombased.html')
 # 
 # @app.route('/upload', methods=['GET', 'POST'])
 # def predict():
@@ -535,6 +543,11 @@ def recommend():
     # If it's a GET request, just render the recommendation form
     return render_template('recommend.html')
 
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Ensure the database is created
     app.run(debug=True)
+else:
+    gunicorn_app = app
 
