@@ -129,5 +129,5 @@ weasel==0.4.1
 websocket-client==1.8.0
 Werkzeug==3.0.3
 wheel==0.45.1
-wrapt==1.16.0
+wrapt
 wsproto==1.2.0
