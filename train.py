@@ -6,7 +6,7 @@ import os
 import shutil
 
 # Define dataset paths
-dataset_path = "finaldata"  # Update to your actual dataset path
+dataset_path = "finaldata" 
 train_path = os.path.join(dataset_path, "train")
 val_path = os.path.join(dataset_path, "val")
 
@@ -66,12 +66,12 @@ import tensorflow as tf
 # Load the trained model from .h5
 model = tf.keras.models.load_model("deficiency_classifier.h5")
 
-# 1️⃣ Save Model in TensorFlow SavedModel format (Corrected)
+#  Save Model in TensorFlow SavedModel format (Corrected)
 saved_model_dir = "saved_model/deficiency_classifier"
-model.export(saved_model_dir)  # ✅ Correct method for exporting a SavedModel
+model.export(saved_model_dir)
 print("Model saved in SavedModel format.")
 
-# 2️⃣ Convert to TensorFlow Lite (TFLite) format
+# Convert to TensorFlow Lite (TFLite) format
 converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_dir)
 tflite_model = converter.convert()
 
@@ -80,7 +80,7 @@ with open("deficiency_classifier.tflite", "wb") as f:
     f.write(tflite_model)
 print("TFLite model saved.")
 
-# 3️⃣ Apply Post-Training Quantization for Further Size Reduction
+# Apply Post-Training Quantization for Further Size Reduction
 converter.optimizations = [tf.lite.Optimize.DEFAULT]  # Enable quantization
 tflite_quantized_model = converter.convert()
 
