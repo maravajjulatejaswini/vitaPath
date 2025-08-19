@@ -49,8 +49,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)  # Increased length for hashed passwords
-
+    password = db.Column(db.String(255), nullable=False)  
 # Route for Signup Page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -125,7 +124,7 @@ def login():
 
 # Email validation function using Hunter.io
 def verify_email_exists(email):
-    hunter_api_key = "b4229aa30ab3a569894b51c8b05b007641ce636e" # Replace with actual API key
+    hunter_api_key = "b4229aa30ab3a569894b51c8b05b007641ce636e" #  API key
     url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={hunter_api_key}"
     
     try:
@@ -277,15 +276,14 @@ MODEL_PATH = r"D:\Desktop\essentials\feature wise major\feature wise major\f1 im
 interpreter = tf.lite.Interpreter(model_path=MODEL_PATH)
 interpreter.allocate_tensors()
 
-# Get input and output tensor details
+
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
-# Define class labels (update these with your dataset class names)
 class_labels = ['Vitamin A and B12 deficiency', 'B1, B2 ,B3 ,Iron deficiency', 
                 'B2, B3, B12 deficiency', 'B7, B9, C deficiency', 'C deficiency']
 
-# Ensure the 'uploads' folder exists for storing uploaded images
+
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -550,4 +548,5 @@ if __name__ == '__main__':
     app.run(debug=True)
 else:
     gunicorn_app = app
+
 
