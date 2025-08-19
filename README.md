@@ -1,1 +1,1 @@
-# vitaPath is a web app developed majorly using python's flask that handles the job of detecting vitamin deficiencies using Machine Learning models through images.
+# vitaPath is a web app developed using python's flask that detects vitamin deficiencies using Convolutional neural networks.
